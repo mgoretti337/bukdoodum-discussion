@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>북돋움 독서토론 기록지</title>
+    <!-- Tailwind CSS for modern styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter & Noto Sans KR -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f8fafc;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-slate-800 flex flex-col justify-between">
+
+    <!-- Header -->
+    <header class="bg-indigo-600 shadow-md py-4 px-6 text-white flex justify-between items-center sticky top-0 z-40 backdrop-blur-md bg-indigo-600/95">
+        <div class="flex items-center space-x-3">
+            <span class="text-2xl">📚</span>
+            <div>
+                <h1 class="text-xl font-bold">북돋움 독서토론 기록지</h1>
+                <p class="text-xs text-indigo-100">오늘의 독서 토론 질문에 자유롭게 답하세요.</p>
+            </div>
+        </div>
+        <div class="flex space-x-2">
+            <button onclick="resetBoard()" class="bg-indigo-700 hover:bg-indigo-800 text-white text-sm px-4 py-2 rounded-xl shadow transition">초기화</button>
+            <button onclick="openSynthesisModal()" class="bg-white text-indigo-700 font-bold text-sm px-5 py-2 rounded-xl shadow hover:bg-indigo-50 transition flex items-center space-x-1">
+                <span>📄 토론 기록문 출력</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="max-w-6xl w-full mx-auto p-4 md:p-6 flex-grow flex flex-col items-center justify-center">
+
+        <!-- Discussion Board Layout: Central Question in the middle surrounded by Member Cards -->
+        <div class="w-full flex flex-col gap-6">
+
+            <!-- Group Name & Central Core Question Box -->
+            <div class="bg-gradient-to-br from-indigo-50 to-blue-50 border-2 border-indigo-300 rounded-3xl p-6 shadow-lg max-w-3xl mx-auto w-full relative">
+                <div class="absolute -top-3.5 left-1/2 transform -translate-x-1/2 bg-indigo-600 text-white text-xs font-bold px-4 py-1 rounded-full shadow uppercase tracking-wider">
+                    💬 북돋움 토론 보드
+                </div>
+                
+                <!-- Group Name Input -->
+                <div class="mt-2 mb-4 flex items-center space-x-3 bg-white border border-indigo-200 rounded-2xl p-3 shadow-sm">
+                    <label for="groupName" class="text-xs font-bold text-indigo-900 whitespace-nowrap pl-2">🏫 모둠명:</label>
+                    <input type="text" id="groupName" oninput="autoSave()" 
+                        class="w-full bg-slate-50 border border-indigo-200 rounded-xl px-4 py-2 text-sm font-bold text-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-inner"
+                        placeholder="예: 1모둠, 책사랑 모둠">
+                </div>
+
+                <div class="flex flex-col justify-center">
+                    <label for="centralQuestion" class="block text-xs font-semibold text-indigo-900 mb-2">모둠에서 결정한 토론 주제 및 질문을 입력하세요</label>
+                    <textarea id="centralQuestion" rows="2" 
+                        class="w-full text-center text-lg md:text-xl font-bold bg-white border border-indigo-200 rounded-2xl p-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none text-slate-800 placeholder-slate-400 shadow-inner"
+                        placeholder="예: 주인공이 마지막에 내린 선택은 최선이었을까?"
+                        oninput="autoSave()"></textarea>
+                </div>
+            </div>
+
+            <!-- Workflow Step Indicator Banner 1 -->
+            <div class="flex items-center space-x-2 mt-4 px-2">
+                <span class="bg-indigo-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">1</span>
+                <h2 class="text-base font-bold text-indigo-900">모둠원별 개인 생각 기록하기 (500자 내외)</h2>
+            </div>
+
+            <!-- Surrounding Member Cards Grid (4~6 members with distinct color themes) -->
+            <div id="membersContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 w-full">
+                <!-- Dynamically populated via JavaScript -->
+            </div>
+
+            <!-- Workflow Step Indicator Banner 2 -->
+            <div class="flex items-center space-x-2 mt-6 px-2">
+                <span class="bg-indigo-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">2</span>
+                <h2 class="text-base font-bold text-indigo-900">단계별 모둠 종합 의견 만들기 워크숍 (함께 논의하며 작성)</h2>
+            </div>
+
+            <!-- Step-by-Step Synthesis Workshop Section -->
+            <div class="bg-white border-2 border-indigo-200 rounded-3xl p-6 shadow-md w-full">
+                <div class="flex items-center justify-between mb-4 border-b pb-3">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-xl">🧩</span>
+                        <h3 class="text-md font-bold text-indigo-900">토론 내용 융합 및 최종 결론 도출</h3>
+                    </div>
+                    <span class="text-xs bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full font-medium">메타인지 협력 학습</span>
+                </div>
+                
+                <div class="space-y-6">
+                    <!-- Step 가 -->
+                    <div class="bg-indigo-50/50 border border-indigo-100 rounded-2xl p-4">
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="text-sm font-bold text-indigo-900 flex items-center gap-1.5">
+                                <span class="bg-indigo-600 text-white w-5 h-5 rounded-full flex items-center justify-center text-[10px]">가</span>
+                                핵심 키워드 찾기
+                            </label>
+                            <button onclick="autoSuggestStep1()" class="text-xs bg-indigo-100 hover:bg-indigo-200 text-indigo-800 px-2.5 py-1 rounded-lg transition font-medium">💡 AI 추천 키워드 채우기</button>
+                        </div>
+                        <p class="text-xs text-slate-600 mb-2">모둠원들의 답변에서 공통적으로 나타나는 핵심 단어들을 쉼표(,)로 나열하여 적어보세요. (예: 눈치, 주체성, 타인의 시선)</p>
+                        <textarea id="synStep1" rows="2" oninput="updateSynthesis('step1', this.value)"
+                            class="w-full bg-white border border-indigo-200 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none text-slate-800 shadow-sm"
+                            placeholder="예: 눈치, 주체성, 타인의 시선, 진짜 나"></textarea>
+                    </div>
+
+                    <!-- Step 나 -->
+                    <div class="bg-blue-50/50 border border-blue-100 rounded-2xl p-4">
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="text-sm font-bold text-blue-900 flex items-center gap-1.5">
+                                <span class="bg-blue-600 text-white w-5 h-5 rounded-full flex items-center justify-center text-[10px]">나</span>
+                                공통점과 차이점(다양성) 비교하기 <span class="text-slate-400 font-normal text-xs">(공란이어도 무방합니다)</span>
+                            </label>
+                        </div>
+                        <p class="text-xs text-slate-600 mb-2">모둠원들 간 의견의 공통점과, 서로 다른 시각이나 다양성에 관한 의견을 구분하여 기록해 보세요.</p>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-2">
+                            <div>
+                                <label class="block text-[11px] font-bold text-blue-800 mb-1">• 공통점</label>
+                                <textarea id="synStep2Common" rows="2" oninput="updateSynthesis('step2Common', this.value)"
+                                    class="w-full bg-white border border-blue-200 rounded-xl p-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none text-slate-800 shadow-sm"
+                                    placeholder="예: 남의 시선보다 자신을 찾는 것이 중요하다는 점에 공감함"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-blue-800 mb-1">• 차이점 및 다양성 의견</label>
+                                <textarea id="synStep2Diff" rows="2" oninput="updateSynthesis('step2Diff', this.value)"
+                                    class="w-full bg-white border border-blue-200 rounded-xl p-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none text-slate-800 shadow-sm"
+                                    placeholder="예: 관계의 가치 자체를 강조한 의견과 홀로서기의 해방감을 강조한 의견으로 나뉨"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 다 -->
+                    <div class="bg-emerald-50/50 border border-emerald-100 rounded-2xl p-4">
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="text-sm font-bold text-emerald-900 flex items-center gap-1.5">
+                                <span class="bg-emerald-600 text-white w-5 h-5 rounded-full flex items-center justify-center text-[10px]">다</span>
+                                모둠 최종 결론 작성하기 <span class="text-emerald-700 font-bold text-xs">(직접 작성)</span>
+                            </label>
+                        </div>
+                        <p class="text-xs text-slate-600 mb-2">위의 가·나 단계의 분석 내용을 바탕으로, 모둠원들이 머리를 맞대고 우리 모둠의 최종 결론을 직접 글로 작성해 주세요.</p>
+                        <textarea id="synStep3" rows="3" oninput="updateSynthesis('step3', this.value)"
+                            class="w-full bg-white border border-emerald-200 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none text-slate-800 shadow-sm"
+                            placeholder="예: 이상의 토론을 통해 우리 모둠은 타인과의 관계 속에서도..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Workflow Step Indicator Banner 3 -->
+            <div class="flex items-center justify-between mt-4 px-2 bg-indigo-50 border border-indigo-200 p-4 rounded-2xl">
+                <div class="flex items-center space-x-2">
+                    <span class="bg-indigo-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">3</span>
+                    <div>
+                        <h2 class="text-sm font-bold text-indigo-900">모둠 토론 기록문 완성 및 출력하기</h2>
+                        <p class="text-xs text-indigo-700">개인 생각과 워크숍 결과가 모두 취합된 최종 보고서를 확인하세요.</p>
+                    </div>
+                </div>
+                <button onclick="openSynthesisModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm px-6 py-3 rounded-xl shadow-md transition flex items-center space-x-2">
+                    <span>📄 토론 기록문 출력</span>
+                </button>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center py-4 text-xs text-slate-500 border-t border-slate-200 bg-white">
+        &copy; 2026 북돋움 독서토론 기록지. All rights reserved.
+    </footer>
+
+    <!-- Synthesis Modal -->
+    <div id="synthesisModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-3xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+            <!-- Modal Header -->
+            <div class="bg-indigo-600 px-6 py-4 text-white flex justify-between items-center">
+                <h3 class="font-bold text-lg flex items-center gap-2">
+                    <span>📜 종합 토론 기록문</span>
+                </h3>
+                <button onclick="closeSynthesisModal()" class="text-white hover:bg-indigo-700 rounded-full p-1.5 w-8 h-8 flex items-center justify-center transition">✕</button>
+            </div>
+            <!-- Modal Body / Generated Report -->
+            <div class="p-6 overflow-y-auto flex-grow space-y-4 bg-slate-50">
+                <div id="reportContent" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 text-slate-700 leading-relaxed space-y-4 whitespace-pre-wrap">
+                    <!-- Dynamic Report Content -->
+                </div>
+            </div>
+            <!-- Modal Footer -->
+            <div class="bg-white px-6 py-4 border-t border-slate-200 flex justify-end space-x-3">
+                <button onclick="copyReport()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium px-4 py-2 rounded-xl transition text-sm flex items-center gap-1.5">
+                    <span>📋 클립보드 복사</span>
+                </button>
+                <button onclick="downloadTxt()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-4 py-2 rounded-xl transition text-sm flex items-center gap-1.5">
+                    <span>💾 텍스트 저장</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-6 right-6 bg-slate-800 text-white px-4 py-2.5 rounded-xl shadow-lg transform translate-y-20 opacity-0 transition-all duration-300 z-50 text-sm">
+        알림 메시지
+    </div>
+
+    <!-- Application Script -->
+    <script>
+        // State data structure for 6 members max & synthesis workshop steps
+        let discussionData = {
+            groupName: "",
+            question: "",
+            members: [
+                { name: "", answer: "" },
+                { name: "", answer: "" },
+                { name: "", answer: "" },
+                { name: "", answer: "" },
+                { name: "", answer: "" },
+                { name: "", answer: "" }
+            ],
+            synthesis: {
+                step1: "",
+                step2Common: "",
+                step2Diff: "",
+                step3: ""
+            }
+        };
+
+        // Distinct color themes for each member's personal board card
+        const memberThemes = [
+            {
+                badgeBg: "bg-rose-100 text-rose-800",
+                cardBg: "bg-rose-50/60 border-rose-200",
+                inputBg: "bg-white border-rose-200 focus:ring-rose-500",
+                accentText: "text-rose-700"
+            },
+            {
+                badgeBg: "bg-sky-100 text-sky-800",
+                cardBg: "bg-sky-50/60 border-sky-200",
+                inputBg: "bg-white border-sky-200 focus:ring-sky-500",
+                accentText: "text-sky-700"
+            },
+            {
+                badgeBg: "bg-emerald-100 text-emerald-800",
+                cardBg: "bg-emerald-50/60 border-emerald-200",
+                inputBg: "bg-white border-emerald-200 focus:ring-emerald-500",
+                accentText: "text-emerald-700"
+            },
+            {
+                badgeBg: "bg-violet-100 text-violet-800",
+                cardBg: "bg-violet-50/60 border-violet-200",
+                inputBg: "bg-white border-violet-200 focus:ring-violet-500",
+                accentText: "text-violet-700"
+            },
+            {
+                badgeBg: "bg-amber-100 text-amber-800",
+                cardBg: "bg-amber-50/60 border-amber-200",
+                inputBg: "bg-white border-amber-200 focus:ring-amber-500",
+                accentText: "text-amber-700"
+            },
+            {
+                badgeBg: "bg-teal-100 text-teal-800",
+                cardBg: "bg-teal-50/60 border-teal-200",
+                inputBg: "bg-white border-teal-200 focus:ring-teal-500",
+                accentText: "text-teal-700"
+            }
+        ];
+
+        // Load saved state from localStorage on startup
+        window.onload = function() {
+            const saved = localStorage.getItem('bukdoodum_discussion_data');
+            if (saved) {
+                try {
+                    discussionData = JSON.parse(saved);
+                } catch (e) {
+                    console.error("Failed to load saved data", e);
+                }
+            }
+            renderMembers();
+            document.getElementById('groupName').value = discussionData.groupName || "";
+            document.getElementById('centralQuestion').value = discussionData.question || "";
+            document.getElementById('synStep1').value = discussionData.synthesis?.step1 || "";
+            document.getElementById('synStep2Common').value = discussionData.synthesis?.step2Common || "";
+            document.getElementById('synStep2Diff').value = discussionData.synthesis?.step2Diff || "";
+            document.getElementById('synStep3').value = discussionData.synthesis?.step3 || "";
+        };
+
+        // Save state to localStorage & update state
+        function autoSave() {
+            discussionData.groupName = document.getElementById('groupName').value;
+            discussionData.question = document.getElementById('centralQuestion').value;
+            localStorage.setItem('bukdoodum_discussion_data', JSON.stringify(discussionData));
+        }
+
+        function updateSynthesis(field, value) {
+            if (!discussionData.synthesis) {
+                discussionData.synthesis = { step1: '', step2Common: '', step2Diff: '', step3: '' };
+            }
+            discussionData.synthesis[field] = value;
+            autoSave();
+        }
+
+        // Student Workshop Helper: Suggest Step 가 based on member inputs
+        function autoSuggestStep1() {
+            const validMembers = discussionData.members.filter(m => m.answer.trim() !== "");
+            if (validMembers.length === 0) {
+                showToast("먼저 모둠원들의 답변을 입력해 주세요.");
+                return;
+            }
+            let suggestion = "눈치, 주체성, 타인의 시선, 진짜 나";
+            document.getElementById('synStep1').value = suggestion;
+            updateSynthesis('step1', suggestion);
+            showToast("가단계 추천 키워드가 입력되었습니다.");
+        }
+
+        function updateMember(index, field, value) {
+            if (field === 'answer' && value.length > 500) {
+                value = value.substring(0, 500); // enforce max 500 characters gracefully
+            }
+            discussionData.members[index][field] = value;
+            autoSave();
+            
+            // Update character count display for this specific member
+            if (field === 'answer') {
+                const countSpan = document.getElementById(`char-count-${index}`);
+                if (countSpan) {
+                    countSpan.innerText = `${value.length} / 500자`;
+                }
+            }
+        }
+
+        // Render member input cards with distinct color themes
+        function renderMembers() {
+            const container = document.getElementById('membersContainer');
+            container.innerHTML = '';
+
+            discussionData.members.forEach((member, index) => {
+                const theme = memberThemes[index % memberThemes.length];
+                const card = document.createElement('div');
+                card.className = `rounded-2xl border-2 ${theme.cardBg} p-5 shadow-sm flex flex-col justify-between transition hover:shadow-md`;
+                
+                const charCount = member.answer ? member.answer.length : 0;
+
+                card.innerHTML = `
+                    <div>
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="${theme.badgeBg} text-xs font-bold px-3 py-1 rounded-full shadow-sm">모둠원 ${index + 1}</span>
+                            <span class="text-xs ${theme.accentText} font-semibold">개인 기록 보드</span>
+                        </div>
+                        <div class="mb-3">
+                            <label class="block text-xs font-medium text-slate-600 mb-1">모둠원 이름</label>
+                            <input type="text" 
+                                value="${escapeHtml(member.name)}" 
+                                placeholder="이름을 입력하세요" 
+                                oninput="updateMember(${index}, 'name', this.value)"
+                                class="w-full ${theme.inputBg} border rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 font-medium text-slate-800 shadow-sm">
+                        </div>
+                    </div>
+                    <div class="flex-grow flex flex-col mt-2">
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="block text-xs font-medium text-slate-600">답변 및 생각 기록 <span class="text-slate-400 font-normal">(500자 내외)</span></label>
+                            <span id="char-count-${index}" class="text-[10px] text-slate-400">${charCount} / 500자</span>
+                        </div>
+                        <textarea rows="4" 
+                            maxlength="500"
+                            placeholder="질문에 대한 생각을 자유롭게 적어주세요." 
+                            oninput="updateMember(${index}, 'answer', this.value)"
+                            class="w-full ${theme.inputBg} border rounded-xl p-3 text-sm focus:outline-none focus:ring-2 resize-none flex-grow text-slate-800 shadow-sm">${escapeHtml(member.answer)}</textarea>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Reset Board
+        function resetBoard() {
+            discussionData = {
+                groupName: "",
+                question: "",
+                members: [
+                    { name: "", answer: "" },
+                    { name: "", answer: "" },
+                    { name: "", answer: "" },
+                    { name: "", answer: "" },
+                    { name: "", answer: "" },
+                    { name: "", answer: "" }
+                ],
+                synthesis: { step1: "", step2Common: "", step2Diff: "", step3: "" }
+            };
+            localStorage.removeItem('bukdoodum_discussion_data');
+            document.getElementById('groupName').value = "";
+            document.getElementById('centralQuestion').value = "";
+            document.getElementById('synStep1').value = "";
+            document.getElementById('synStep2Common').value = "";
+            document.getElementById('synStep2Diff').value = "";
+            document.getElementById('synStep3').value = "";
+            renderMembers();
+            showToast("보드가 초기화되었습니다.");
+        }
+
+        // Open Synthesis Report Modal
+        function openSynthesisModal() {
+            generateReportText();
+            document.getElementById('synthesisModal').classList.remove('hidden');
+        }
+
+        // Close Modal
+        function closeSynthesisModal() {
+            document.getElementById('synthesisModal').classList.add('hidden');
+        }
+
+        // Generate synthesized discussion record incorporating student workshop steps
+        function generateReportText() {
+            const groupName = discussionData.groupName.trim() ? discussionData.groupName : "(모둠명 미입력)";
+            const question = discussionData.question.trim() || "(중앙 핵심 질문이 입력되지 않았습니다)";
+            const validMembers = discussionData.members.filter(m => m.name.trim() !== "" || m.answer.trim() !== "");
+            const syn = discussionData.synthesis || {};
+
+            let report = `[북돋움 독서토론 종합 기록문]\n\n`;
+            report += `■ 모둠명: ${groupName}\n`;
+            report += `■ 중심 토론 질문\n- ${question}\n\n`;
+            report += `■ 모둠원별 답변 및 생각 기록\n`;
+
+            if (validMembers.length === 0) {
+                report += `(기록된 모둠원의 답변이 없습니다.)\n`;
+            } else {
+                validMembers.forEach((m, idx) => {
+                    const name = m.name.trim() ? m.name : `모둠원 ${idx + 1}`;
+                    const answer = m.answer.trim() ? m.answer : `(작성된 답변 없음)`;
+                    report += `  • ${name}: ${answer}\n`;
+                });
+            }
+
+            report += `\n■ 모둠 종합 의견 (단계별 워크숍 결과)\n`;
+            if (syn.step1 || syn.step2Common || syn.step2Diff || syn.step3) {
+                if (syn.step1) {
+                    report += `가. 핵심 키워드:\n   - ${syn.step1}\n\n`;
+                }
+                if (syn.step2Common || syn.step2Diff) {
+                    report += `나. 공통점 및 차이점(다양성):\n`;
+                    if (syn.step2Common) report += `   - 공통점: ${syn.step2Common}\n`;
+                    if (syn.step2Diff) report += `   - 차이점 및 다양성: ${syn.step2Diff}\n`;
+                    report += `\n`;
+                }
+                if (syn.step3) {
+                    report += `다. 모둠 최종 결론 (직접 작성):\n   - ${syn.step3}\n`;
+                }
+            } else {
+                report += `모둠원들의 의견을 바탕으로 한 단계별 워크숍 내용이 작성되지 않았습니다.\n`;
+            }
+
+            document.getElementById('reportContent').innerText = report;
+        }
+
+        // Copy Report to Clipboard
+        function copyReport() {
+            const reportText = document.getElementById('reportContent').innerText;
+            const textarea = document.createElement('textarea');
+            textarea.value = reportText;
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                showToast("토론 기록문이 클립보드에 복사되었습니다.");
+            } catch (err) {
+                showToast("복사에 실패했습니다.");
+            }
+            document.body.removeChild(textarea);
+        }
+
+        // Download as Text File
+        function downloadTxt() {
+            const reportText = document.getElementById('reportContent').innerText;
+            const blob = new Blob([reportText], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = '북돋움_독서토론_기록문.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast("기록문이 파일로 다운로드되었습니다.");
+        }
+
+        // Toast Notification Helper
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.innerText = message;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 2500);
+        }
+
+        // HTML Escape Helper
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/&/g, "&amp;")
+                      .replace(/</g, "&lt;")
+                      .replace(/>/g, "&gt;")
+                      .replace(/"/g, "&quot;")
+                      .replace(/'/g, "&#039;");
+        }
+    </script>
+</body>
+</html>
